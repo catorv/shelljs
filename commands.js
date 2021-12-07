@@ -2,6 +2,7 @@ module.exports = [
   'cat',
   'cd',
   'chmod',
+  'clear',
   // TODO(nfischer): uncomment this when shell.cmd() is finished.
   // 'cmd',
   'cp',
