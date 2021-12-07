@@ -19,6 +19,7 @@ module.exports = [
   'rm',
   'sed',
   'set',
+  'sleep',
   'sort',
   'tail',
   'tempdir',

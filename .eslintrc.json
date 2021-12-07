@@ -24,6 +24,7 @@
     "no-plusplus": "off",
     "no-prototype-builtins": "off",
     "no-throw-literal": "off",
+    "no-undef": "off",
     "no-underscore-dangle": "off",
     "no-use-before-define": "off",
     "operator-linebreak": "off",
