@@ -1,3 +1,4 @@
+const { ChildProcess } = require('child_process');
 const origShell = require('./shell.js');
 const cmdArrayAttr = '__cmdStart__';
 
@@ -9,7 +10,14 @@ const proxyifyCmd = (t, ...cmdStart) => {
       .concat(args)
       .map(x => JSON.stringify(x));
     // Run this command in the shell
-    return origShell.exec.call(this.stdout, newArgs.join(' '));
+    return new Promise((resolve, reject) => {
+      const context = {
+        __async: true,
+        __resolve: resolve,
+        __reject: reject
+      };
+      origShell.exec.call(context, newArgs.join(' '));
+    });
   };
   // Store the list of commands, in case we have a subcommand chain
   t[cmdArrayAttr] = cmdStart;
@@ -44,8 +52,36 @@ const proxyifyCmd = (t, ...cmdStart) => {
 
       // Return the attribute, either if it exists or if it's in the
       // `noProxyifyList`, otherwise return a new Proxy
-      if (methodName in target || noProxyifyList.includes(methodName)) {
+      if (noProxyifyList.includes(methodName)) {
         return target[methodName];
+      } else if (methodName in target) {
+        const method = target[methodName];
+        if (typeof method === 'function') {
+          return function() {
+            return new Promise((resolve, reject) => {
+              const context = {
+                __async: true,
+                __resolve: resolve,
+                __reject: reject
+              };
+              const result = method.apply(context, arguments);
+              if (result instanceof ChildProcess) return;
+              if (result && typeof result.then === 'function') {
+                result.then(resolve).catch(reject);
+              } else if (result.code === 0) {
+                resolve(result);
+              } else {
+                reject({
+                  code: result.code,
+                  type: 'shell',
+                  message: result.stderr,
+                  stdout: result.stdout,
+                });
+              }
+            });
+          }
+        }
+        return method;
       }
       return proxyifyCmd(null, ...target[cmdArrayAttr], methodName);
     },

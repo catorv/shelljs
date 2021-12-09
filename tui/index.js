@@ -1,0 +1,35 @@
+const { write, writeln } = require('./write.js');
+const cursor = require('./cursor.js');
+const spin = require('./spinner');
+spin.wait = spin.spinPromise;
+const { clear, clearLine, clearScreenDown } = require('./clear.js');
+
+let tui = {
+  clear,
+  clearLine,
+  clearScreenDown,
+  cursor,
+  spin,
+  write,
+  writeln,
+}
+
+const getWritableStream = () => process.stdout || process.stderr;
+
+Object.defineProperty(tui, 'columns', {
+  get() { return getWritableStream().columns; }
+});
+
+Object.defineProperty(tui, 'rows', {
+  get() { return getWritableStream().rows; }
+});
+
+Object.defineProperty(tui, 'colorDepth', {
+  get() { return getWritableStream().getColorDepth(); }
+});
+
+Object.defineProperty(tui, 'isTTY', {
+  get() { return getWritableStream().isTTY; }
+});
+
+module.exports = tui;

@@ -3,6 +3,7 @@ var common = require('./common');
 common.register('sleep', _sleep, {
   cmdOptions: {},
   allowGlobbing: false,
+  wrapOutput: false,
 });
 
 var REG_NUMBER = /^\d+(?:\.\d+)?$/;
@@ -25,13 +26,21 @@ function _sleep(options, waitTime) {
   } else {
     common.error('sleep time must be an number');
   }
+
+  ms = ms | 0;
   if (ms > 0) {
-    msleep(ms | 0);
+    if (this.__async) {
+      return msleepPromise(ms);
+    }
+    msleep(ms);
   }
-  return '';
 }
 module.exports = _sleep;
 
 function msleep(n) {
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, n);
+}
+
+function msleepPromise(n) {
+  return new Promise(resolve => { setTimeout(resolve, n); });
 }

@@ -205,6 +205,20 @@ function _exec(command, options, callback) {
     options = { async: true };
   }
 
+  if (this.__async) {
+    const origCallback = callback;
+    callback = (code, stdout, stderr) => {
+      if (origCallback) {
+        origCallback.apply(null, arguments);
+      }
+      if (code === 0) {
+        resolve({ code, stdout, stderr });
+      } else {
+        reject({ code, type: 'shell', message: stderr, stdout });
+      }
+    };
+  }
+
   // Callback is defined with options.
   if (typeof options === 'object' && typeof callback === 'function') {
     options.async = true;
