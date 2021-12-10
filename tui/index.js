@@ -3,12 +3,14 @@ const cursor = require('./cursor.js');
 const spin = require('./spinner');
 spin.wait = spin.spinPromise;
 const { clear, clearLine, clearScreenDown } = require('./clear.js');
+const log = require('./logger.js');
 
 let tui = {
   clear,
   clearLine,
   clearScreenDown,
   cursor,
+  log,
   spin,
   write,
   writeln,

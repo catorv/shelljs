@@ -129,7 +129,7 @@ class Ora {
     this.text = this.options.text;
     this.prefixText = this.options.prefixText;
     this.linesToClear = 0;
-    this.indent = this.options.indent || 1;
+    this.indent = this.options.indent;
     this.discardStdin = this.options.discardStdin;
     this.isDiscardingStdin = false;
   }

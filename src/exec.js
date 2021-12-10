@@ -212,9 +212,9 @@ function _exec(command, options, callback) {
         origCallback.apply(null, arguments);
       }
       if (code === 0) {
-        resolve({ code, stdout, stderr });
+        this.__resolve({ code, stdout, stderr });
       } else {
-        reject({ code, type: 'shell', message: stderr, stdout });
+        this.__reject({ code, type: 'shell', message: stderr, stdout });
       }
     };
   }

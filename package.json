@@ -28,9 +28,12 @@
     "global.js",
     "make.js",
     "plugin.js",
+    "proxy.js",
     "shell.js",
+    "style.js",
     "bin",
-    "src"
+    "src",
+    "tui"
   ],
   "scripts": {
     "check-node-support": "node scripts/check-node-support",
