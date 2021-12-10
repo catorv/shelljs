@@ -26,6 +26,7 @@
   "files": [
     "commands.js",
     "global.js",
+    "keyboard.js",
     "make.js",
     "plugin.js",
     "proxy.js",
