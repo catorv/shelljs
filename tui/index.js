@@ -6,6 +6,7 @@ const { clear, clearLine, clearScreenDown } = require('./clear.js');
 const log = require('./logger.js');
 const chooser = require('./chooser.js');
 const alert = require('./alert.js');
+const confirm = require('./confirm.js');
 
 let tui = {
   clear,
@@ -18,6 +19,7 @@ let tui = {
   writeln,
   chooser,
   alert,
+  confirm,
 }
 
 const getWritableStream = () => process.stdout || process.stderr;

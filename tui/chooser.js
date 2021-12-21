@@ -92,7 +92,7 @@ module.exports = async function chooser(options = {}) {
     if (key.name === 'c' && key.ctrl || breakable && key.name === 'q') {
       writeln(style.red.bgYellow(' Cancelled! '));
       cursor.show();
-      process.exit(0);
+      process.exit(1);
     }
 
     if (/\d/.test(key.name)) {
