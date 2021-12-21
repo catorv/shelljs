@@ -57,4 +57,20 @@ cursor.moveToStart = (writableStream = process.stderr) => {
   cursor.moveTo(0, undefined, writableStream);
 }
 
+cursor.moveUp = (rows = 1, writableStream = process.stderr) => {
+  return cursor.move(0, -rows);
+}
+
+cursor.moveDown = (rows = 1, writableStream = process.stderr) => {
+  return cursor.move(0, rows);
+}
+
+cursor.moveLeft = (columns = 1, writableStream = process.stderr) => {
+  return cursor.move(-columns, 0);
+}
+
+cursor.moveRight = (columns = 1, writableStream = process.stderr) => {
+  return cursor.move(columns, 0);
+}
+
 module.exports = cursor;
