@@ -5,6 +5,7 @@ spin.wait = spin.spinPromise;
 const { clear, clearLine, clearScreenDown } = require('./clear.js');
 const log = require('./logger.js');
 const chooser = require('./chooser.js');
+const alert = require('./alert.js');
 
 let tui = {
   clear,
@@ -16,6 +17,7 @@ let tui = {
   write,
   writeln,
   chooser,
+  alert,
 }
 
 const getWritableStream = () => process.stdout || process.stderr;
