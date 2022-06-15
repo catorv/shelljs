@@ -57,8 +57,7 @@ wiki](https://github.com/shelljs/shelljs/wiki/Using-ShellJS-Plugins).
 For documentation on all the latest features, check out our
 [README](https://github.com/shelljs/shelljs). To read docs that are consistent
 with the latest release, check out [the npm
-page](https://www.npmjs.com/package/shelljs) or
-[shelljs.org](http://documentup.com/shelljs/shelljs).
+page](https://www.npmjs.com/package/shelljs).
 
 ## Installing
 
@@ -118,6 +117,13 @@ Instead, we recommend a local import (standard for npm packages):
 
 ```javascript
 var shell = require('shelljs');
+shell.echo('hello world');
+```
+
+Alternatively, we also support importing as a module with:
+
+```javascript
+import shell from 'shelljs';
 shell.echo('hello world');
 ```
 
@@ -188,6 +194,10 @@ Notable exceptions:
 + In symbolic modes, `a-r` and `-r` are identical.  No consideration is
   given to the `umask`.
 + There is no "quiet" option, since default behavior is to run silent.
++ Windows OS uses a very different permission model than POSIX. `chmod()`
+  does its best on Windows, but there are limits to how file permissions can
+  be set. Note that WSL (Windows subsystem for Linux) **does** follow POSIX,
+  so cross-platform compatibility should not be a concern there.
 
 Returns a [ShellString](#shellstringstr) indicating success or failure.
 
@@ -203,6 +213,7 @@ Available options:
 + `-r`, `-R`: recursive
 + `-L`: follow symlinks
 + `-P`: don't follow symlinks
++ `-p`: preserve file mode, ownership, and timestamps
 
 Examples:
 
@@ -372,6 +383,7 @@ Available options:
 + `-v`: Invert `regex_filter` (only print non-matching lines).
 + `-l`: Print only filenames of matching files.
 + `-i`: Ignore case.
++ `-n`: Print line numbers.
 
 Examples:
 
@@ -431,10 +443,14 @@ Available options:
 + `-A`: all files (include files beginning with `.`, except for `.` and `..`)
 + `-L`: follow symlinks
 + `-d`: list directories themselves, not their contents
-+ `-l`: list objects representing each file, each with fields containing `ls
-        -l` output fields. See
-        [`fs.Stats`](https://nodejs.org/api/fs.html#fs_class_fs_stats)
-        for more info
++ `-l`: provides more details for each file. Specifically, each file is
+        represented by a structured object with separate fields for file
+        metadata (see
+        [`fs.Stats`](https://nodejs.org/api/fs.html#fs_class_fs_stats)). The
+        return value also overrides `.toString()` to resemble `ls -l`'s
+        output format for human readability, but programmatic usage should
+        depend on the stable object format rather than the `.toString()`
+        representation.
 
 Examples:
 
@@ -672,10 +688,10 @@ Available options:
 + `-a`: Change only the access time
 + `-c`: Do not create any files
 + `-m`: Change only the modification time
-+ `{'-d': someDate}`, `{date: someDate}`: Use `someDate` (instance of
-  `Date`) instead of current time
++ `{'-d': someDate}`, `{date: someDate}`: Use a `Date` instance (ex. `someDate`)
+  instead of current time
 + `{'-r': file}`, `{reference: file}`: Use `file`'s times instead of current
-   time
+  time
 
 Examples:
 
@@ -683,6 +699,7 @@ Examples:
 touch('source.js');
 touch('-c', 'path/to/file.js');
 touch({ '-r': 'referenceFile.txt' }, 'path/to/file.js');
+touch({ '-d': new Date('December 17, 1995 03:24:00'), '-m': true }, 'path/to/file.js');
 touch({ date: new Date('December 17, 1995 03:24:00') }, 'path/to/file.js');
 ```
 
@@ -739,6 +756,11 @@ error returned, or a falsy value otherwise.
 **Note**: do not rely on the
 return value to be an error message. If you need the last error message, use
 the `.stderr` attribute from the last command's return value instead.
+
+
+### errorCode()
+
+Returns the error code from the last command.
 
 
 ### ShellString(str)
