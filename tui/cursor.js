@@ -58,19 +58,19 @@ cursor.moveToStart = (writableStream = process.stderr) => {
 }
 
 cursor.moveUp = (rows = 1, writableStream = process.stderr) => {
-  return cursor.move(0, -rows);
+  return cursor.move(0, -rows, writableStream);
 }
 
 cursor.moveDown = (rows = 1, writableStream = process.stderr) => {
-  return cursor.move(0, rows);
+  return cursor.move(0, rows, writableStream);
 }
 
 cursor.moveLeft = (columns = 1, writableStream = process.stderr) => {
-  return cursor.move(-columns, 0);
+  return cursor.move(-columns, 0, writableStream);
 }
 
 cursor.moveRight = (columns = 1, writableStream = process.stderr) => {
-  return cursor.move(columns, 0);
+  return cursor.move(columns, 0, writableStream);
 }
 
 module.exports = cursor;

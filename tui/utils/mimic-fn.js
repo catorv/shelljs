@@ -55,7 +55,7 @@ const changeToString = (to, from, name) => {
   const newToString = wrappedToString.bind(null, withName, from.toString());
   // Ensure `to.toString.toString` is non-enumerable and has the same `same`
   Object.defineProperty(newToString, 'name', toStringName);
-  Object.defineProperty(to, 'toString', {...toStringDescriptor, value: newToString});
+  Object.defineProperty(to, 'toString', { ...toStringDescriptor, value: newToString });
 };
 
 module.exports = function mimicFunction(to, from, {ignoreNonConfigurable = false} = {}) {

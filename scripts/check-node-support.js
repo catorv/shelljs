@@ -27,9 +27,9 @@ function checkReadme(minNodeVersion) {
   }
 }
 
-function checkEngines(minNodeVersion, package) {
+function checkEngines(minNodeVersion, pkg) {
   var expectedEnginesNode = '>=' + minNodeVersion;
-  if (package.engines.node !== expectedEnginesNode) {
+  if (pkg.engines.node !== expectedEnginesNode) {
     var msg = 'Update package.json to fix the "engines" attribute';
     throw new Error(msg);
   }
@@ -61,8 +61,8 @@ function checkGithubActions(minNodeVersion, maxNodeVersion, githubActionsYaml) {
 try {
   checkReadme(MIN_NODE_VERSION);
 
-  var package = require('../package.json');
-  checkEngines(MIN_NODE_VERSION, package);
+  var pkg = require('../package.json');
+  checkEngines(MIN_NODE_VERSION, pkg);
 
   var githubActionsFileName = path.join(__dirname, '..', '.github', 'workflows',
       'main.yml');

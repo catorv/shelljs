@@ -14,7 +14,7 @@ module.exports = async function(text, defaultValue = true) {
   cursor.hide();
 
   let key;
-  while (key = await read()) {
+  while ((key = await read())) {
     if (key.name === 'y' || key.name === 'n' || key.name === 'return') {
       break;
     }

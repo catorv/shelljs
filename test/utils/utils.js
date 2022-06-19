@@ -65,9 +65,9 @@ function skipIfTrue(booleanValue, t, closure) {
       '\n'
     );
     t.truthy(true); // dummy assertion to satisfy ava v0.19+
-  } else {
-    closure();
+    return null;
   }
+  return closure();
 }
 
 exports.skipOnUnix = skipIfTrue.bind(module.exports, process.platform !== 'win32');

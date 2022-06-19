@@ -79,7 +79,7 @@ module.exports = async function chooser(options = {}) {
 
   const len = items.length;
   let key;
-  while (key = await keyboard.read()) {
+  while ((key = await keyboard.read())) {
     if (key.name === 'return' || key.name === 'space') {
       break;
     }
@@ -90,9 +90,9 @@ module.exports = async function chooser(options = {}) {
     }
 
     if (key.name === 'c' && key.ctrl || breakable && key.name === 'q') {
-      writeln(style.red.bgYellow(' Cancelled! '));
+      writeln(style.red.bgYellow(' Cancelled!'));
       cursor.show();
-      process.exit(1);
+      process.exit(0);
     }
 
     if (/\d/.test(key.name)) {

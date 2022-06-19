@@ -1,6 +1,29 @@
-const { ChildProcess } = require('child_process');
 const origShell = require('./shell.js');
+const common = require('./src/common.js');
 const cmdArrayAttr = '__cmdStart__';
+
+const promisifyExec = function(command, options) {
+  options = { fatal: true, ...options, async: false };
+  options.async = true;
+  return new Promise((resolve, reject) => {
+    origShell.exec(command, options, (code, stdout, stderr) => {
+      const result = origShell.ShellString(stdout, stderr, code);
+      if (code === 0) {
+        resolve(result);
+      } else {
+        common.state.errorCode = code;
+        common.state.error = 'exec: ' + stderr;
+        const error = new common.CommandError(result);
+        error.message = stderr;
+        error.code = code;
+        error.type = 'shell';
+        error.stdout = stdout;
+        error.stderr = stderr;
+        reject(error);
+      }
+    });
+  })
+}
 
 const proxyifyCmd = (t, ...cmdStart) => {
   // Create the target (or use the one passed in)
@@ -10,14 +33,7 @@ const proxyifyCmd = (t, ...cmdStart) => {
       .concat(args)
       .map(x => JSON.stringify(x));
     // Run this command in the shell
-    return new Promise((resolve, reject) => {
-      const context = {
-        __async: true,
-        __resolve: resolve,
-        __reject: reject
-      };
-      origShell.exec.call(context, newArgs.join(' '));
-    });
+    return promisifyExec(newArgs.join(' '));
   };
   // Store the list of commands, in case we have a subcommand chain
   t[cmdArrayAttr] = cmdStart;
@@ -47,42 +63,59 @@ const proxyifyCmd = (t, ...cmdStart) => {
 
     // Prefer the existing attribute, otherwise return another Proxy
     get: (target, methodName) => {
+      if (target[cmdArrayAttr].length === 0) {
+        if (['__esModule', 'default'].includes(methodName)) {
+          return proxyifyCmd(target);
+        }
+
+        if (methodName in target) {
+          if (methodName === 'exec') {
+            return promisifyExec;
+          }
+
+          const method = target[methodName];
+
+          const ignoreOriginalList = [
+            'error', 'errorCode', 'ShellString', 'env', 'config',
+            'dirs', 'popd', 'pushd', 'clear', 'exit',
+          ];
+          if (ignoreOriginalList.includes(methodName)) {
+            return method;
+          }
+
+          if (methodName === 'sleep') {
+            return method.bind({ __async: true });
+          }
+
+          if (typeof method === 'function') {
+            return function() {
+              return new Promise((resolve, reject) => {
+                const result = method.apply(target, arguments);
+                if (result && typeof result.code !== 'undefined' && result.code !== 0) {
+                  result.type = 'shell';
+                  result.message = result.stderr;
+                  reject(result);
+                } else {
+                  resolve(result);
+                }
+              });
+            }
+          }
+
+          return method;
+        }
+      }
+
       // Don't Proxy-ify these attributes, no matter what
-      const noProxyifyList = ['inspect', 'valueOf'];
+      const noProxyifyList = ['inspect', 'valueOf', 'stdout'];
 
       // Return the attribute, either if it exists or if it's in the
       // `noProxyifyList`, otherwise return a new Proxy
-      if (noProxyifyList.includes(methodName)) {
+      if (methodName in target || noProxyifyList.includes(methodName)) {
         return target[methodName];
-      } else if (methodName in target) {
-        const method = target[methodName];
-        if (typeof method === 'function') {
-          return function() {
-            return new Promise((resolve, reject) => {
-              const context = {
-                __async: true,
-                __resolve: resolve,
-                __reject: reject
-              };
-              const result = method.apply(context, arguments);
-              if (result instanceof ChildProcess) return;
-              if (result && typeof result.then === 'function') {
-                result.then(resolve).catch(reject);
-              } else if (result.code === 0) {
-                resolve(result);
-              } else {
-                reject({
-                  code: result.code,
-                  type: 'shell',
-                  message: result.stderr,
-                  stdout: result.stdout,
-                });
-              }
-            });
-          }
-        }
-        return method;
       }
+
+
       return proxyifyCmd(null, ...target[cmdArrayAttr], methodName);
     },
   };
@@ -102,4 +135,6 @@ const proxyifyCmd = (t, ...cmdStart) => {
 // origShell.ShellString = ShellStringProxy;
 
 // export the modified shell
-module.exports = proxyifyCmd(origShell);
+const shell = proxyifyCmd(origShell)
+shell.sync = origShell;
+module.exports = shell;

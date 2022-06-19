@@ -4,7 +4,7 @@ exports.readline = function (prompt) {
   return new Promise(resolve => {
     const rl = readline.createInterface({
       input: process.stdin,
-      output: process.stdout
+      output: process.stdout,
     });
 
     rl.question(prompt, async answer => {
@@ -18,7 +18,7 @@ exports.read = function read() {
   return new Promise(function (resolve) {
     const rl = readline.createInterface({
       input: process.stdin,
-      output: null
+      output: null,
     });
 
     // 注册 keypress 事件

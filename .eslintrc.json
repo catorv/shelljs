@@ -1,10 +1,12 @@
 {
   "env": {
-    "node": true
+    "node": true,
+    "es6": true
   },
-  "extends": "airbnb-base/legacy",
+  "parser": "babel-eslint",
+  "extends": "eslint:recommended",
   "rules": {
-    "comma-dangle": ["error", "always-multiline"],
+    "comma-dangle": "off",
     "consistent-return": "off",
     "curly": ["error", "multi-line"],
     "func-names": "off",

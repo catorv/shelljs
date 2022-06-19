@@ -390,7 +390,7 @@ class Ora {
 
 function ora(options) {
   return new Ora(options);
-};
+}
 
 ora.spinPromise = async function oraPromise(action, options) {
   const actionIsFunction = typeof action === 'function';
