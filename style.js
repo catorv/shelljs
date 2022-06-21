@@ -51,5 +51,11 @@ var chalk = require('chalk');
 // - bgMagentaBright
 // - bgCyanBright
 // - bgWhiteBright
+//
+// 256 and Truecolor color support
+//
+// - rgb - Example: chalk.rgb(255, 136, 0).bold('Orange!')
+// - hex - Example: chalk.hex('#FF8800').bold('Orange!')
+// - ansi256 - Example: chalk.bgAnsi256(194)('Honeydew, more or less')
 
 module.exports = chalk;

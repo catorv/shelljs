@@ -7,8 +7,14 @@ const log = require('./logger.js');
 const chooser = require('./chooser.js');
 const alert = require('./alert.js');
 const confirm = require('./confirm.js');
+const utils = require('./utils/utils.js');
 
 let tui = {
+  get columns() { return utils.columns(); },
+  get rows() { return utils.rows(); },
+  get colorDepth() { return utils.colorDepth(); },
+  get isTTY() { return utils.isTTY(); },
+
   clear,
   clearLine,
   clearScreenDown,
@@ -20,24 +26,8 @@ let tui = {
   chooser,
   alert,
   confirm,
+
+  ellipsis: utils.ellipsis,
 }
-
-const getWritableStream = () => process.stdout || process.stderr;
-
-Object.defineProperty(tui, 'columns', {
-  get() { return getWritableStream().columns; }
-});
-
-Object.defineProperty(tui, 'rows', {
-  get() { return getWritableStream().rows; }
-});
-
-Object.defineProperty(tui, 'colorDepth', {
-  get() { return getWritableStream().getColorDepth(); }
-});
-
-Object.defineProperty(tui, 'isTTY', {
-  get() { return getWritableStream().isTTY; }
-});
 
 module.exports = tui;

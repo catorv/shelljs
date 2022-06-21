@@ -53,7 +53,6 @@
     "shjs": "./bin/shjs"
   },
   "dependencies": {
-    "babel-eslint": "^10.1.0",
     "bl": "^5.0.0",
     "chalk": "^4.1.2",
     "execa": "^1.0.0",
@@ -72,6 +71,7 @@
     "@types/node": "^16.11.12",
     "ava": "^1.4.1",
     "coffee-script": "^1.12.7",
+    "babel-eslint": "^10.1.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.17.3",

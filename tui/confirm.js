@@ -1,43 +1,30 @@
-const style = require('../style.js');
-const cursor = require('./cursor.js');
-const { write, writeln } = require('./write.js');
-const { read } = require('../keyboard.js');
-const { clearLine } = require('./clear.js');
+const chooser = require('./chooser.js');
 
-module.exports = async function(text, defaultValue = true) {
-  const yLetter = defaultValue ? 'Y' : 'y';
-  const nLetter = defaultValue ? 'n' : 'N';
-  write(text + ' (' +
-    style.cyan.underline(yLetter) + style.cyan('es') + '/' +
-    style.cyan.underline(nLetter) + style.cyan('o') + ')');
+module.exports = async function(options, defaultValue = true) {
+  if (typeof options === 'string') {
+    options = { title: options };
+  }
 
-  cursor.hide();
-
-  let key;
-  while ((key = await read())) {
-    if (key.name === 'y' || key.name === 'n' || key.name === 'return') {
-      break;
-    }
-
-    if (key.name === 'c' && key.ctrl) {
-      writeln(style.red.bgYellow(' Cancelled! '));
-      cursor.show();
-      process.exit(1);
+  const items = options.items;
+  if (typeof items !== 'undefined') {
+    if (!Array.isArray(items) || items.length !== 2) {
+      throw new Error('options.items must be a array with two items');
     }
   }
 
-  let result = key.name === 'y';
+  const value = await chooser({
+    items: ['Yes', 'No'],
+    value: defaultValue ? 0 : 1,
+    inline: true,
+    onKeyPress: function(event) {
+      if (event.name === 'y') {
+        return { value: 0, select: true };
+      } else if (event.name === 'n') {
+        return { value: 1, select: true };
+      }
+    },
+    ...options,
+  });
 
-  if (key.name === 'return') {
-    result = defaultValue;
-  }
-
-  await clearLine();
-  await cursor.moveToStart();
-  write(text + ' ');
-  writeln(result ? style.green('yes') : style.yellow('no'));
-
-  cursor.show();
-
-  return result;
+  return value === 0;
 }
